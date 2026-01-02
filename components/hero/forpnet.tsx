@@ -1,34 +1,32 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { SKILLS } from "@/features/home/data/skills";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useEffect, useState, useRef } from "react";
+import { IoCheckmarkCircle as CheckmarkIcon } from "react-icons/io5";
 import { useAnimationFrame } from "framer-motion";
-import { CheckCircle2 } from "lucide-react"; 
-
-// --- MOCKED DATA FOR PREVIEW ---
-// In your real app, keep importing this from "@/features/home/data/skills"
-const SKILLS = [
-  { name: "AI Integration", description: "Building agentic workflows and LLM applications." },
-  { name: "Full Stack", description: "React, Next.js, Node.js, and cloud infrastructure." },
-  { name: "Automation", description: "Streamlining business processes with custom software." },
-];
 
 function HeroContent() {
   return (
-    <div className="mx-auto grid w-full max-w-2xl grid-cols-1 divide-y divide-dashed divide-zinc-700">
-      <p className="text-zinc-100 px-4 text-2xl font-semibold tracking-tight sm:text-left sm:text-3xl hidden sm:block pb-2">
+    <div className="mx-auto grid w-full max-w-2xl grid-cols-1 divide-y divide-dashed divide-border-edge">
+      <p className="text-foreground px-4 text-2xl font-semibold tracking-tight sm:text-left sm:text-3xl hidden sm:block pb-2">
         HELLO
       </p>
-      <h1 className="text-white px-4 text-[32px] font-semibold tracking-tight sm:text-[40px] sm:text-left py-2">
+      <h1 className="text-foreground px-4 text-[32px] font-semibold tracking-tight sm:text-[40px] sm:text-left py-2">
         <span className="sm:hidden">Hey Hey </span>
         We Create the Future
       </h1>
 
-      <p className="text-zinc-400 px-4 text-lg/8 text-left py-4">
+      <p className="text-foreground/80 px-4 text-lg/8 text-left py-4">
         We help forward-thinking leaders architect the future through AI, automation, agentic workflows, and proprietary digital platforms.
       </p>
 
       <ul
-        className="text-zinc-200 space-y-2 divide-y divide-dashed divide-zinc-700"
+        className="text-foreground space-y-2 divide-y divide-dashed divide-border-edge"
         aria-label="Skills and qualifications"
       >
         {SKILLS.map((item, index) => (
@@ -36,17 +34,20 @@ function HeroContent() {
             key={item.name || index}
             className="relative py-2 pl-11 last:mb-0"
           >
-            <CheckCircle2
+            <CheckmarkIcon
               aria-hidden="true"
-              className="absolute left-4 size-5 text-zinc-500 top-1/2 -translate-y-1/2"
+              className={cn(
+                "absolute left-4 size-5 text-muted-foreground/80",
+                "top-1/2 -translate-y-1/2",
+              )}
             />
             <div className="flex flex-row gap-x-1">
               {item.name && (
-                <span className="font-semibold text-zinc-100">
+                <span className="font-semibold text-foreground">
                   {item.name}:
                 </span>
               )}
-              <span className="text-zinc-400">{item.description}</span>
+              <span className="text-foreground/80">{item.description}</span>
             </div>
           </li>
         ))}
@@ -55,16 +56,42 @@ function HeroContent() {
   );
 }
 
-// --- MAIN COMPONENT ---
+type HeroProps = {
+  imageSrcDesktop?: string;
+  imageSrcDesktopDark?: string;
+  imageSrcMobile?: string;
+  imageSrcMobileDark?: string;
+  imageAlt?: string;
+};
 
-export default function Hero() {
-  // In your real app, use: const { resolvedTheme } = useTheme();
-  const isDark = true; // Forcing dark mode for this preview
+const DEFAULT_IMAGES = {
+  desktop: "/images/vertical-profile.jpg",
+  desktopDark: "/images/vertical-profile-dark.jpg",
+  mobile: "/images/horizontal-profile.jpg",
+  mobileDark: "/images/horizontal-profile-dark.jpg",
+  alt: "Professional headshot of Tim, a Frontend Developer based in San Francisco Bay Area",
+};
+
+export default function Hero({
+  imageSrcDesktop = DEFAULT_IMAGES.desktop,
+  imageSrcMobile = DEFAULT_IMAGES.mobile,
+  imageSrcDesktopDark = DEFAULT_IMAGES.desktopDark,
+  imageSrcMobileDark = DEFAULT_IMAGES.mobileDark,
+  imageAlt = DEFAULT_IMAGES.alt,
+}: HeroProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <div className="relative mx-auto max-w-5xl lg:p-8 bg-zinc-950 overflow-hidden rounded-2xl min-h-[600px] flex items-center">
-      
-      {/* --- 1. Background Particles & Noise --- */}
+    <div className="relative mx-auto max-w-5xl lg:p-8 bg-zinc-950 overflow-hidden rounded-2xl">
+      {/* --- Background Particles & Noise --- */}
       <div className="absolute inset-0 z-0">
         <ParticleCanvas />
         <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay">
@@ -82,19 +109,37 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* --- 2. Main Content --- */}
-      <div className="relative z-10 w-full flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-6">
-        
-        {/* Image Section (Mocked for Preview) */}
-        <div className="w-full lg:col-span-1 mb-8 lg:mb-0">
-           {/* Placeholder for your Next/Image */}
-          <div className="relative h-full w-full flex items-center justify-center min-h-[300px] bg-zinc-900/50 rounded-lg border border-zinc-800 border-dashed">
-            <span className="text-zinc-500 text-sm">Profile Image Placeholder</span>
+      {/* --- Main Content --- */}
+      <div className="relative z-10 flex flex-col border-border-edge lg:grid lg:grid-cols-2 lg:gap-x-6 lg:border lg:border-dashed">
+        {/* Image Section */}
+        <div className="w-full lg:col-span-1">
+          {/* Desktop Image */}
+          <div className="hidden lg:block relative h-full w-full">
+            <Image
+              src={isDark ? imageSrcDesktopDark : imageSrcDesktop}
+              alt={imageAlt}
+              width={600}
+              height={712}
+              priority
+              className="h-full w-full object-cover"
+            />
+          </div>
+
+          {/* Mobile Image */}
+          <div className="block lg:hidden relative w-full">
+            <Image
+              src={isDark ? imageSrcMobileDark : imageSrcMobile}
+              alt={imageAlt}
+              width={600}
+              height={400}
+              priority
+              className="h-auto w-full object-cover aspect-4/3 md:aspect-auto"
+            />
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="lg:col-span-1 lg:flex lg:items-center lg:border-l lg:border-dashed lg:border-zinc-800">
+        <div className="lg:col-span-1 lg:flex lg:items-center lg:border-l lg:border-dashed lg:border-border-edge">
           <HeroContent />
         </div>
       </div>
@@ -102,7 +147,7 @@ export default function Hero() {
   );
 }
 
-// --- THE PARTICLE ENGINE (Copy this to your codebase) ---
+// --- The Particle Engine ---
 
 function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -134,14 +179,13 @@ function ParticleCanvas() {
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
 
+    const canvas = canvasRef.current;
+    
     const resize = () => {
       // Use container dimensions instead of window to fit the specific hero section
       if (!containerRef.current || !canvasRef.current) return;
       const { width, height } = containerRef.current.getBoundingClientRect();
       
-      // Ensure we have valid dimensions
-      if (width === 0 || height === 0) return;
-
       canvasRef.current.width = width;
       canvasRef.current.height = height;
       
@@ -188,27 +232,16 @@ function ParticleCanvas() {
       }
     };
 
-    // Attach listeners
     window.addEventListener("resize", resize);
-    // Use container for mouse events to be more specific if possible, 
-    // but window is safer for broad strokes
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
     
-    // Initial resize
     resize();
-
-    // ResizeObserver is often better for specific divs changing size
-    const resizeObserver = new ResizeObserver(() => resize());
-    if (containerRef.current) {
-        resizeObserver.observe(containerRef.current);
-    }
 
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
-      resizeObserver.disconnect();
     };
   }, []);
 
